@@ -7,14 +7,14 @@ var restify = require('restify');
 
 // Setup Restify Server
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 3978, function () {
+server.listen(process.env.port || process.env.PORT || 3979, function () {
    console.log('%s listening to %s', server.name, server.url); 
 });
   
 // Create chat bot
 var connector = new builder.ChatConnector({
-    appId: process.env.MICROSOFT_APP_ID,
-    appPassword: process.env.MICROSOFT_APP_PASSWORD
+    appId: 'd2b14853-9126-4b2b-bf9c-dc81a41d9387',
+    appPassword: 'WXSughapaNbQT0gR1mcTESb'
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
