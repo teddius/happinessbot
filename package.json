@@ -1,0 +1,23 @@
+{
+  "name": "happinessbot",
+  "version": "1.0.0",
+  "description": "This is the fantastic happiness bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teddius/happinessbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teddius/happinessbot/issues"
+  },
+  "homepage": "https://github.com/teddius/happinessbot#readme",
+  "dependencies": {
+    "botbuilder": "^3.7.0",
+    "restify": "^4.3.0"
+  }
+}
