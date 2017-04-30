@@ -8,13 +8,13 @@ var restify = require('restify');
 // Setup Restify Server
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3979, function () {
-   console.log('%s listening to %s', server.name, server.url); 
+    console.log('%s listening to %s', server.name, server.url);
 });
-  
+
 // Create chat bot
 var connector = new builder.ChatConnector({
-    appId: 'd2b14853-9126-4b2b-bf9c-dc81a41d9387',
-    appPassword: 'WXSughapaNbQT0gR1mcTESb'
+  //  appId: 'd2b14853-9126-4b2b-bf9c-dc81a41d9387',
+   // appPassword: 'WXSughapaNbQT0gR1mcTESb'
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
@@ -28,6 +28,33 @@ bot.dialog('/', intents);
 
 
 
+intents.onDefault([
+    function (session, args, next) {
+        if (!session.userData.name) {
+            session.beginDialog('/profile');
+        } else {
+            next();
+        }
+    },
+    function (session, results) {
+        //  session.send('Hello %s!', session.userData.name);
+        session.beginDialog('/intro');
+    }
+]);
+
+bot.dialog('/intro', [
+    function (session) {
+        var responseText = 'Hi ';
+        responseText += session.userData.name;
+        responseText += ', I am Joyful Carron I want to remind you what amazing things happen in your life!';
+        session.send(responseText);
+        session.endDialog();
+    }
+]);
+
+//=========================================================
+// INTENTS Dialogs
+//=========================================================
 
 intents.matches(/^change name/i, [
     function (session) {
@@ -47,18 +74,6 @@ intents.matches(/^change age/i, [
     }
 ]);
 
-intents.onDefault([
-    function (session, args, next) {
-        if (!session.userData.name) {
-            session.beginDialog('/profile');
-        } else {
-            next();
-        }
-    },
-    function (session, results) {
-        session.send('Hello %s!', session.userData.name);
-    }
-]);
 
 bot.dialog('/profile', [
     function (session) {
@@ -66,10 +81,8 @@ bot.dialog('/profile', [
     },
     function (session, results) {
         session.userData.name = results.response;
-        builder.Prompts.text(session, 'Hi! What is your age?');
-    },
-    function (session, results) {
-        session.userData.age = results.response;
         session.endDialog();
     }
 ]);
+
+
