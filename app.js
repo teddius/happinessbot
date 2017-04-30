@@ -26,6 +26,9 @@ server.post('/api/messages', connector.listen());
 var intents = new builder.IntentDialog();
 bot.dialog('/', intents);
 
+
+
+
 intents.matches(/^change name/i, [
     function (session) {
         session.beginDialog('/profile');
