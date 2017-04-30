@@ -1,6 +1,8 @@
 var builder = require('botbuilder');
 var restify = require('restify');
 
+var moments = {};
+
 //=========================================================
 // Bot Setup
 //=========================================================
@@ -13,8 +15,8 @@ server.listen(process.env.port || process.env.PORT || 3979, function () {
 
 // Create chat bot
 var connector = new builder.ChatConnector({
-  //  appId: 'd2b14853-9126-4b2b-bf9c-dc81a41d9387',
-   // appPassword: 'WXSughapaNbQT0gR1mcTESb'
+    appId: 'd2b14853-9126-4b2b-bf9c-dc81a41d9387',
+    appPassword: 'WXSughapaNbQT0gR1mcTESb'
 });
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
@@ -26,28 +28,63 @@ server.post('/api/messages', connector.listen());
 var intents = new builder.IntentDialog();
 bot.dialog('/', intents);
 
-
+var firstStart = false;
 
 intents.onDefault([
     function (session, args, next) {
         if (!session.userData.name) {
+            firstStart = true;
             session.beginDialog('/profile');
         } else {
             next();
         }
     },
     function (session, results) {
-        //  session.send('Hello %s!', session.userData.name);
-        session.beginDialog('/intro');
+        if(firstStart) {
+            firstStart = false;
+            session.beginDialog('/intro');
+        }
+        else {
+            session.beginDialog('/theIntro');
+        }
+
+        session.beginDialog('/newMoment');
     }
 ]);
 
 bot.dialog('/intro', [
     function (session) {
-        var responseText = 'Hi ';
-        responseText += session.userData.name;
-        responseText += ', I am Joyful Carron I want to remind you what amazing things happen in your life!';
+        var responseText = 'Hi ' + session.userData.name + ', ';
+        responseText += 'I am Joyful Carron I want to remind you what amazing things happen in your life!';
+
         session.send(responseText);
+        session.endDialog();
+    }
+]);
+
+bot.dialog('/theIntro', [
+    function (session) {
+        session.send('Hi ' + session.userData.name);
+    }
+]);
+
+bot.dialog('/newMoment', [
+    function (session) {
+        builder.Prompts.text(session, 'Tell me what has brightened your day!');
+    },
+    function (session, results) {
+        var day = new Date(Date.now()).getDate();
+        if(moments[day] == undefined) {
+            moments[day] = [];
+        }
+        moments[day].push(results.response);
+        // moments.push(day);
+        // moments[day].push({
+        //     'date': Date.now(),
+        //     'message': results.response
+        // });
+
+        session.send('Thanks, I added it! In the evening you choose your best moment of the day! Enjoy your day!');
         session.endDialog();
     }
 ]);
@@ -65,15 +102,27 @@ intents.matches(/^change name/i, [
     }
 ]);
 
-intents.matches(/^change age/i, [
+// intents.matches(/^/i, [
+//     function(session) {
+
+//     }
+// ]);
+
+intents.matches(/^what are my .* today/i, [
     function (session) {
-        session.beginDialog('/profile');
+        session.send('Wow, look what I’ve found!');
+
+        var todayMoments = moments[new Date(Date.now()).getDate()];
+        for(var i = 0; i < todayMoments.length; i++) {
+            session.send(todayMoments[i]);
+        }
+
+        session.send('I wonder if you will rate this as your highlight of your week! Have a good night!');
     },
     function (session, results) {
-        session.send('Ok... Changed your age to %s', session.userData.age);
+        session.send('Ok... Changed your name to %s', session.userData.name);
     }
 ]);
-
 
 bot.dialog('/profile', [
     function (session) {
@@ -84,5 +133,3 @@ bot.dialog('/profile', [
         session.endDialog();
     }
 ]);
-
-
